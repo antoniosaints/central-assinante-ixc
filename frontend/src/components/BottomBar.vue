@@ -15,7 +15,7 @@ const isActive = (tab) => route.meta.tab === tab.name;
 
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-app border-t border-slate-100 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.4rem)] pt-2 shadow-nav backdrop-blur"
+    class="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-app border-t border-slate-100 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)-0.4rem)] pt-2 shadow-nav backdrop-blur"
   >
     <div class="flex items-stretch justify-around">
       <RouterLink
