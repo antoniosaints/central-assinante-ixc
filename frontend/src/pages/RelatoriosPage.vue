@@ -1,7 +1,7 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { FileText, ScrollText, ChevronRight, Hash } from 'lucide-vue-next';
+import { FileText, ScrollText, ChevronLeft, ChevronRight, Hash } from 'lucide-vue-next';
 
 import PageContainer from '@/components/PageContainer.vue';
 import Card from '@/components/Card.vue';
@@ -28,7 +28,7 @@ const { contratos, loading: contratosLoading } = storeToRefs(contratoStore);
 onMounted(() => contratoStore.carregar());
 
 const { data: faturas, loading, error, run } = useAsync(() =>
-  FinanceiroService.listarPendencias(),
+  FinanceiroService.listarFaturas(),
 );
 
 const carregando = computed(() =>
@@ -37,6 +37,32 @@ const carregando = computed(() =>
 const lista = computed(() =>
   abaAtiva.value === 'contratos' ? contratos.value : faturas.value || [],
 );
+
+const itensPorPagina = 8;
+const paginaFaturas = ref(1);
+const totalPaginasFaturas = computed(() =>
+  Math.max(1, Math.ceil((faturas.value?.length || 0) / itensPorPagina)),
+);
+const listaPaginada = computed(() => {
+  if (abaAtiva.value !== 'faturas') return lista.value;
+  const inicio = (paginaFaturas.value - 1) * itensPorPagina;
+  return lista.value.slice(inicio, inicio + itensPorPagina);
+});
+const exibindoFaturas = computed(() => {
+  const total = faturas.value?.length || 0;
+  if (!total) return '';
+  const inicio = (paginaFaturas.value - 1) * itensPorPagina + 1;
+  const fim = Math.min(paginaFaturas.value * itensPorPagina, total);
+  return `${inicio}-${fim} de ${total}`;
+});
+
+watch([abaAtiva, () => faturas.value?.length], () => {
+  paginaFaturas.value = 1;
+});
+
+watch(totalPaginasFaturas, (total) => {
+  if (paginaFaturas.value > total) paginaFaturas.value = total;
+});
 
 // ---- Detalhe ----
 const sheetOpen = ref(false);
@@ -55,7 +81,8 @@ const detalheCampos = computed(() => {
       { label: 'Descrição', value: i.descricao },
       { label: 'Recebimento', value: i.tipoRecebimento },
       { label: 'Vencimento', date: i.vencimento },
-      { label: 'Valor', money: i.valor },
+      ...(i.pagoEm ? [{ label: 'Pago em', date: i.pagoEm }] : []),
+      ...(i.valor ? [{ label: 'Valor', money: i.valor }] : []),
     ];
   }
   return [
@@ -99,7 +126,7 @@ const detalheCampos = computed(() => {
 
       <div v-else-if="lista.length" class="space-y-3">
         <Card
-          v-for="item in lista"
+          v-for="item in listaPaginada"
           :key="item.id"
           interactive
           class="!p-4 cursor-pointer"
@@ -130,6 +157,32 @@ const detalheCampos = computed(() => {
             </div>
           </div>
         </Card>
+
+        <div
+          v-if="abaAtiva === 'faturas' && totalPaginasFaturas > 1"
+          class="flex items-center justify-between rounded-2xl bg-white px-3 py-2 shadow-card"
+        >
+          <button
+            class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition active:scale-95 disabled:opacity-40"
+            :disabled="paginaFaturas === 1"
+            aria-label="Página anterior"
+            @click="paginaFaturas -= 1"
+          >
+            <ChevronLeft class="h-4 w-4" />
+          </button>
+          <div class="text-center">
+            <p class="text-xs font-semibold text-slate-700">Página {{ paginaFaturas }} de {{ totalPaginasFaturas }}</p>
+            <p class="text-[11px] text-slate-400">{{ exibindoFaturas }}</p>
+          </div>
+          <button
+            class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition active:scale-95 disabled:opacity-40"
+            :disabled="paginaFaturas === totalPaginasFaturas"
+            aria-label="Próxima página"
+            @click="paginaFaturas += 1"
+          >
+            <ChevronRight class="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <EmptyState v-else title="Nada por aqui" message="Não há registros nesta categoria." />

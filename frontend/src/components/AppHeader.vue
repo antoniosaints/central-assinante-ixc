@@ -30,7 +30,8 @@ const nome = computed(() => firstName(props.perfil?.nome || ''));
           </div>
         </template>
         <template v-else>
-          <Avatar :name="perfil?.nome" :src="perfil?.avatar" />
+          <!-- <Avatar :name="perfil?.nome" :src="perfil?.avatar" /> -->
+          <img src="/LOGO_CAS.png" class="h-11 w-11 object-contain rounded-sm" alt="Logo CAS" />
           <div class="leading-tight">
             <p class="text-xs font-medium text-white/80">{{ saudacao }},</p>
             <p class="text-lg font-bold">{{ nome }}</p>

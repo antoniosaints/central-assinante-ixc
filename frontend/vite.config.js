@@ -14,7 +14,7 @@ export default defineConfig({
     // Proxy opcional: o frontend fala com o backend em /api.
     proxy: {
       '/api': {
-        target: 'http://localhost:3333',
+        target: 'http://192.168.6.141:3333',
         changeOrigin: true,
       },
     },

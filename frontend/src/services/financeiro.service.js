@@ -6,6 +6,11 @@ export const FinanceiroService = {
     return data;
   },
 
+  async listarFaturas() {
+    const { data } = await http.get('/financeiro/faturas');
+    return data;
+  },
+
   async proximaFatura() {
     const { data } = await http.get('/financeiro/proxima-fatura');
     return data;

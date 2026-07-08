@@ -1,5 +1,5 @@
 <script setup>
-import { UserRound, FilePenLine, KeyRound, LogOut } from 'lucide-vue-next';
+import { UserRound, LogOut } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
@@ -14,8 +14,6 @@ function sair() {
 
 const items = [
   { label: 'Meus Dados', icon: UserRound, action: () => router.push('/meus-dados') },
-  { label: 'Atualizar Cadastro', icon: FilePenLine, action: () => router.push('/meus-dados') },
-  { label: 'Alterar Senha', icon: KeyRound, action: () => alert('Fluxo de alteração de senha (a integrar).') },
   { label: 'Sair', icon: LogOut, danger: true, action: sair },
 ];
 

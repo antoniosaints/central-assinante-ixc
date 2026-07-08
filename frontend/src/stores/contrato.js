@@ -4,6 +4,21 @@ import { ContratoService } from '@/services/contrato.service';
 
 const SELECAO_KEY = 'cas.contrato';
 
+function compararIdDesc(a, b) {
+  const idA = Number(a.id);
+  const idB = Number(b.id);
+  if (!Number.isNaN(idA) && !Number.isNaN(idB)) return idB - idA;
+  return String(b.id).localeCompare(String(a.id), 'pt-BR', { numeric: true });
+}
+
+function contratoPrioritario(lista) {
+  return (
+    [...lista].filter((contrato) => contrato.status === 'ativo').sort(compararIdDesc)[0] ||
+    [...lista].sort(compararIdDesc)[0] ||
+    null
+  );
+}
+
 /**
  * Contratos do cliente logado + contrato selecionado.
  * O plano exibido no app depende do contrato escolhido (quando há mais de um).
@@ -30,8 +45,7 @@ export const useContratoStore = defineStore('contrato', () => {
     try {
       contratos.value = await ContratoService.listar();
       // Garante uma seleção válida.
-      const existe = contratos.value.some((c) => c.id === selecionadoId.value);
-      if (!existe) selecionar(contratos.value[0]?.id || '');
+      selecionar(contratoPrioritario(contratos.value)?.id || '');
     } catch (err) {
       error.value = err;
     } finally {

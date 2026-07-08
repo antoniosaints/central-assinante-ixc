@@ -11,6 +11,7 @@ import {
   Gauge,
   Activity,
   ChevronDown,
+  ChevronsUpDown,
   UserRound,
 } from 'lucide-vue-next';
 
@@ -24,12 +25,25 @@ import Skeleton from '@/components/Skeleton.vue';
 import ErrorState from '@/components/ErrorState.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
+import BottomSheet from '@/components/BottomSheet.vue';
+import DateText from '@/components/DateText.vue';
 import { useContratoStore } from '@/stores/contrato';
 import { ConsumoService } from '@/services/consumo.service';
 import { formatBytes, formatDuration, shortTime, shortMonth } from '@/utils/format';
 
 const contratoStore = useContratoStore();
-const { selecionado, loading: contratosLoading } = storeToRefs(contratoStore);
+const {
+  selecionado,
+  contratos,
+  temMultiplos,
+  loading: contratosLoading,
+} = storeToRefs(contratoStore);
+const contratoSheet = ref(false);
+
+function escolherContrato(id) {
+  contratoStore.selecionar(id);
+  contratoSheet.value = false;
+}
 
 // ---- Logins ----
 const logins = ref([]);
@@ -179,6 +193,21 @@ watch(loginSelId, async () => {
     </div>
 
     <!-- Seleção / status do login -->
+    <button
+      v-if="temMultiplos && selecionado"
+      class="mb-3 flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3 text-left shadow-card transition active:scale-[0.99]"
+      @click="contratoSheet = true"
+    >
+      <div class="min-w-0">
+        <p class="text-xs font-semibold text-slate-400">Contrato em consumo</p>
+        <p class="truncate text-sm font-bold text-slate-800">{{ selecionado.nome }}</p>
+      </div>
+      <div class="flex shrink-0 items-center gap-2">
+        <StatusBadge :status="selecionado.status" />
+        <ChevronsUpDown class="h-4 w-4 text-primary" />
+      </div>
+    </button>
+
     <div v-if="contratosLoading || loginsLoading">
       <Skeleton rounded="rounded-3xl" class="h-28 w-full" />
     </div>
@@ -329,5 +358,28 @@ watch(loginSelId, async () => {
         :icon="Gauge"
       />
     </template>
+    <BottomSheet :open="contratoSheet" title="Escolha o contrato" @close="contratoSheet = false">
+      <div class="space-y-2">
+        <button
+          v-for="contrato in contratos"
+          :key="contrato.id"
+          class="flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition active:scale-[0.99]"
+          :class="
+            contrato.id === selecionado?.id
+              ? 'border-primary bg-primary/5'
+              : 'border-slate-200 md:hover:bg-slate-50'
+          "
+          @click="escolherContrato(contrato.id)"
+        >
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-bold text-slate-800">{{ contrato.nome }}</p>
+            <p class="truncate text-xs text-slate-400">
+              Contrato #{{ contrato.id }} · Renova <DateText :value="contrato.renovacao" />
+            </p>
+          </div>
+          <StatusBadge :status="contrato.status" />
+        </button>
+      </div>
+    </BottomSheet>
   </PageContainer>
 </template>

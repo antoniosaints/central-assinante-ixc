@@ -7,6 +7,10 @@ function num(v) {
   const n = Number(v);
   return Number.isNaN(n) ? 0 : n;
 }
+function numOuNull(v) {
+  const n = Number(v);
+  return Number.isNaN(n) ? null : n;
+}
 function data(v) {
   return v && v !== '0000-00-00' ? v : '';
 }
@@ -16,22 +20,67 @@ function ddmmyyyy(d) {
   return `${dia}/${mes}/${d.getFullYear()}`;
 }
 
-/** Janela de vencimento: de ~1 ano atrás (pega atrasados) a ~1 ano à frente. */
+function timestampVencimento(fatura) {
+  if (!fatura?.vencimento) return Number.NEGATIVE_INFINITY;
+  const timestamp = new Date(`${fatura.vencimento}T00:00:00`).getTime();
+  return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
+}
+
+export function ordenarFaturasMaisRecentes(faturas) {
+  return [...faturas].sort((a, b) => timestampVencimento(b) - timestampVencimento(a));
+}
+
+// /** Janela de vencimento: de ~1 ano atrás (pega atrasados) a ~1 ano à frente. */
+// function periodoVencimento() {
+//   const hoje = new Date();
+//   const inicio = new Date(hoje);
+//   inicio.setFullYear(hoje.getFullYear() - 1);
+//   const fim = new Date(hoje);
+//   fim.setFullYear(hoje.getFullYear() + 1);
+//   return { inicio: ddmmyyyy(inicio), fim: ddmmyyyy(fim) };
+// }
+
 function periodoVencimento() {
   const hoje = new Date();
-  const inicio = new Date(hoje);
-  inicio.setFullYear(hoje.getFullYear() - 1);
-  const fim = new Date(hoje);
-  fim.setFullYear(hoje.getFullYear() + 1);
-  return { inicio: ddmmyyyy(inicio), fim: ddmmyyyy(fim) };
+
+  // Primeiro dia do mês anterior
+  const inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+
+  // Último dia do mês atual
+  const fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+  return {
+    inicio: ddmmyyyy(inicio),
+    fim: ddmmyyyy(fim),
+  };
 }
 
 /** Boleto vencido quando o vencimento já passou. */
-function statusFatura(vencimento) {
+function statusFatura(reg, vencimento) {
+  if (reg.status === 'R') return 'pago';
   if (!vencimento) return 'pendente';
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   return new Date(`${vencimento}T00:00:00`) < hoje ? 'vencido' : 'pendente';
+}
+
+function valorFatura(reg) {
+  const candidatos = reg.status === 'R'
+    ? [
+        reg.valor_recebido,
+        reg.valor_pago,
+        reg.valor_total_recebido,
+        reg.valor_liquido,
+        reg.valor,
+      ]
+    : [reg.valor_aberto, reg.valor];
+
+  for (const candidato of candidatos) {
+    const valor = numOuNull(candidato);
+    if (valor && valor > 0) return valor;
+  }
+
+  return reg.status === 'R' ? null : 0;
 }
 
 /** Converte um registro fn_areceber (aberto) no formato de fatura da app. */
@@ -42,9 +91,10 @@ function mapFatura(reg) {
     id: reg.id,
     competencia: vencimento.slice(0, 7), // yyyy-MM
     descricao: reg.obs || `Documento ${reg.documento || reg.id}`,
-    valor: num(reg.valor_aberto || reg.valor),
+    valor: valorFatura(reg),
     vencimento,
-    status: statusFatura(vencimento),
+    status: statusFatura(reg, vencimento),
+    pagoEm: data(reg.data_recebimento || reg.data_credito),
     tipoRecebimento: tipo,
     linhaDigitavel: reg.linha_digitavel || '',
     temPix: Boolean(reg.pix_txid),
@@ -52,6 +102,23 @@ function mapFatura(reg) {
     idContrato: reg.id_contrato || '',
     documento: reg.documento || '',
   };
+}
+
+export function normalizarFaturasPendentesIxc(registros) {
+  return ordenarFaturasMaisRecentes(
+    registros
+      .filter((r) => r.status !== 'R' && r.status !== 'C')
+      .filter((r) => num(r.valor_aberto) > 0)
+      .map(mapFatura),
+  );
+}
+
+export function normalizarFaturasRelatorioIxc(registros) {
+  return ordenarFaturasMaisRecentes(
+    registros
+      .filter((r) => r.status !== 'C')
+      .map(mapFatura),
+  );
 }
 
 function clienteIdDaSessao(token) {
@@ -66,8 +133,8 @@ function clienteIdDaSessao(token) {
   return sessao.perfil.id;
 }
 
-async function listarAbertosIxc(idCliente) {
-  const { inicio, fim } = periodoVencimento();
+async function listarFaturasIxc(idCliente, { somentePendentes = false } = {}) {
+  const { fim } = periodoVencimento();
   const body = {
     qtype: 'fn_areceber.id_cliente',
     query: String(idCliente),
@@ -75,34 +142,38 @@ async function listarAbertosIxc(idCliente) {
     page: '1',
     rp: '200000',
     sortname: 'fn_areceber.data_vencimento',
-    sortorder: 'asc',
+    sortorder: 'desc',
     grid_param: JSON.stringify([
       { TB: 'fn_areceber.liberado', OP: '=', P: 'S' },
-      { TB: 'fn_areceber.status', OP: '!=', P: 'R', P2: 'C' },
-      { TB: 'fn_areceber.data_vencimento', OP: 'BE', P: inicio, P2: fim },
+      somentePendentes
+        ? { TB: 'fn_areceber.status', OP: '!=', P: 'R', P2: 'C' }
+        : { TB: 'fn_areceber.status', OP: '!=', P: 'C' },
+      { TB: 'fn_areceber.data_vencimento', OP: '<', P: fim },
     ]),
   };
   const dados = await ixcListar('fn_areceber', body, 'get');
   const registros = Array.isArray(dados?.registros) ? dados.registros : [];
-  // Apenas os que têm valor realmente em aberto.
-  return registros.filter((r) => num(r.valor_aberto) > 0).map(mapFatura);
+  return somentePendentes
+    ? normalizarFaturasPendentesIxc(registros)
+    : normalizarFaturasRelatorioIxc(registros);
 }
 
 export const FinanceiroService = {
   async listarPendencias(token) {
-    if (isIxcConfigured()) return listarAbertosIxc(clienteIdDaSessao(token));
+    if (isIxcConfigured()) return listarFaturasIxc(clienteIdDaSessao(token), { somentePendentes: true });
     await delay();
-    return faturasMock.filter((f) => f.status === 'pendente');
+    return ordenarFaturasMaisRecentes(faturasMock.filter((f) => f.status === 'pendente'));
   },
 
   async listarFaturas(token) {
-    // Em aberto = pendências; histórico completo virá de outro endpoint futuramente.
-    return this.listarPendencias(token);
+    if (isIxcConfigured()) return listarFaturasIxc(clienteIdDaSessao(token));
+    await delay();
+    return ordenarFaturasMaisRecentes(faturasMock.filter((f) => f.status !== 'cancelado'));
   },
 
   async proximaFatura(token) {
     const lista = await this.listarPendencias(token);
-    return lista[0] || null; // já ordenado por vencimento asc
+    return lista[0] || null;
   },
 
   /** Pix (copia e cola + QR) de um boleto via /get_pix. */

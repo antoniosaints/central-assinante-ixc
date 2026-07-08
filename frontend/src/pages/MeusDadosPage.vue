@@ -10,8 +10,6 @@ import {
   Wifi,
   Cake,
   CalendarCheck,
-  Pencil,
-  KeyRound,
 } from 'lucide-vue-next';
 import { formatDate } from '@/utils/format';
 import { useRouter } from 'vue-router';
@@ -21,8 +19,6 @@ import Card from '@/components/Card.vue';
 import Avatar from '@/components/Avatar.vue';
 import Skeleton from '@/components/Skeleton.vue';
 import DateText from '@/components/DateText.vue';
-import PrimaryButton from '@/components/PrimaryButton.vue';
-import SecondaryButton from '@/components/SecondaryButton.vue';
 import { useClienteStore } from '@/stores/cliente';
 import { useContratoStore } from '@/stores/contrato';
 
@@ -106,15 +102,5 @@ const campos = computed(() =>
         </div>
       </template>
     </Card>
-
-    <!-- Ações -->
-    <div class="mt-5 space-y-3">
-      <PrimaryButton :icon="Pencil" @click="() => alert('Editar cadastro (a integrar).')">
-        Editar dados
-      </PrimaryButton>
-      <SecondaryButton :icon="KeyRound" @click="() => alert('Alterar senha (a integrar).')">
-        Alterar senha
-      </SecondaryButton>
-    </div>
   </PageContainer>
 </template>
