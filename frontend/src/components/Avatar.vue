@@ -19,7 +19,7 @@ const sizeClass = computed(() => sizes[props.size] || sizes.md);
 
 <template>
   <div
-    class="flex items-center justify-center overflow-hidden rounded-full bg-primary/10 font-semibold text-primary ring-2 ring-white"
+    class="flex items-center justify-center overflow-hidden rounded-full bg-primary/10 font-semibold text-white ring-2 ring-white"
     :class="sizeClass"
   >
     <img v-if="src" :src="src" :alt="name" class="h-full w-full object-cover" />

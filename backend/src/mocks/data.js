@@ -140,32 +140,40 @@ export const contratos = [
   },
 ];
 
-export const consumoResumo = {
-  mes: '2026-07',
-  download: 842.5, // GB
-  upload: 118.3, // GB
-  total: 960.8, // GB
-  tempoConectadoHoras: 512,
-  franquia: null, // sem franquia
-};
-
-export const consumoHistoricoDiario = [
-  { data: '2026-07-01', download: 28.4, upload: 4.1 },
-  { data: '2026-07-02', download: 31.2, upload: 5.6 },
-  { data: '2026-07-03', download: 22.8, upload: 3.2 },
-  { data: '2026-07-04', download: 40.1, upload: 6.9 },
-  { data: '2026-07-05', download: 35.7, upload: 5.0 },
-  { data: '2026-07-06', download: 44.3, upload: 7.8 },
-  { data: '2026-07-07', download: 26.9, upload: 3.9 },
+// ----- Consumo (radusuarios) — valores em bytes, como no IXC -----
+export const radLoginsMock = [
+  {
+    id: '26686',
+    login: 'demo.login@cas.net.br',
+    ativo: true,
+    online: true,
+    ip: '100.100.12.19',
+    mac: '98:B3:EF:51:20:44',
+    downloadAtual: 3695762593,
+    uploadAtual: 153055644,
+    tempoConectado: 35623,
+    ultimaConexao: '2026-07-08 04:22:58',
+    idContrato: '11984',
+  },
 ];
 
-export const consumoHistoricoMensal = [
-  { competencia: '2026-02', download: 690.2, upload: 92.1 },
-  { competencia: '2026-03', download: 745.8, upload: 101.4 },
-  { competencia: '2026-04', download: 812.3, upload: 110.7 },
-  { competencia: '2026-05', download: 788.5, upload: 105.2 },
-  { competencia: '2026-06', download: 901.0, upload: 124.6 },
-  { competencia: '2026-07', download: 842.5, upload: 118.3 },
+export const radTempoRealMock = [
+  { id: '10', data: '2026-07-08 14:16:41', download: 5428462, upload: 1399033 },
+  { id: '9', data: '2026-07-08 13:56:41', download: 4305738, upload: 1327027 },
+  { id: '8', data: '2026-07-08 13:36:41', download: 551060055, upload: 10868812 },
+  { id: '7', data: '2026-07-08 13:16:41', download: 140022427, upload: 6936579 },
+  { id: '6', data: '2026-07-08 12:56:41', download: 108548500, upload: 6827135 },
+  { id: '5', data: '2026-07-08 12:36:41', download: 446583366, upload: 8734854 },
+  { id: '4', data: '2026-07-08 12:16:41', download: 277736946, upload: 5954449 },
+  { id: '3', data: '2026-07-08 11:56:41', download: 357563847, upload: 5211647 },
+  { id: '2', data: '2026-07-08 11:36:41', download: 9386247, upload: 4041366 },
+  { id: '1', data: '2026-07-08 11:16:41', download: 117989790, upload: 4438651 },
+];
+
+export const radMensalMock = [
+  { id: '652796', data: '2026-07-01 00:00:00', download: 2853809422, upload: 159750948 },
+  { id: '652500', data: '2026-06-01 00:00:00', download: 3110450000, upload: 172300000 },
+  { id: '652120', data: '2026-05-01 00:00:00', download: 2650120000, upload: 141900000 },
 ];
 
 export const pagamentos = [

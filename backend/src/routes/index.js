@@ -70,13 +70,17 @@ router.get('/financeiro/faturas/:id/boleto', wrap(async (req, res) => {
   res.send(buffer);
 }));
 
-// ---------- Consumo ----------
-router.get('/consumo/resumo', wrap(async (req, res) => {
-  res.json(await ConsumoService.buscarResumo());
+// ---------- Consumo (radusuarios) ----------
+router.get('/consumo/logins', wrap(async (req, res) => {
+  res.json(await ConsumoService.listarLogins(getToken(req), req.query.contrato));
 }));
 
-router.get('/consumo/historico', wrap(async (req, res) => {
-  res.json(await ConsumoService.buscarHistorico(req.query.periodo));
+router.get('/consumo/tempo-real', wrap(async (req, res) => {
+  res.json(await ConsumoService.tempoReal(getToken(req), req.query.login));
+}));
+
+router.get('/consumo/mensal', wrap(async (req, res) => {
+  res.json(await ConsumoService.mensal(getToken(req), req.query.login));
 }));
 
 // ---------- Relatórios ----------

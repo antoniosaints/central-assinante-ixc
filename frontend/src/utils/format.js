@@ -60,3 +60,49 @@ export function initials(name = '') {
 export function firstName(name = '') {
   return name.trim().split(/\s+/)[0] || '';
 }
+
+/**
+ * Formata bytes em unidade legível pt-BR (ex.: 2,85 GB, 551 MB, 4,3 MB).
+ * @param {number|string} bytes
+ */
+export function formatBytes(bytes) {
+  const n = Number(bytes);
+  if (!n || Number.isNaN(n)) return '0 B';
+  if (n < 1024) return `${n} B`;
+  const units = ['KB', 'MB', 'GB', 'TB', 'PB'];
+  let value = n / 1024;
+  let i = 0;
+  while (value >= 1024 && i < units.length - 1) {
+    value /= 1024;
+    i += 1;
+  }
+  return `${value.toLocaleString('pt-BR', { maximumFractionDigits: value < 10 ? 2 : 0 })} ${units[i]}`;
+}
+
+/**
+ * Formata segundos em duração curta (ex.: "9h 53m", "45m", "12s").
+ * @param {number|string} seconds
+ */
+export function formatDuration(seconds) {
+  const total = Number(seconds) || 0;
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = Math.floor(total % 60);
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${s}s`;
+}
+
+/** Hora curta (HH:MM) a partir de 'yyyy-MM-dd HH:MM:SS'. */
+export function shortTime(datetime = '') {
+  const m = String(datetime).match(/\d{2}:\d{2}/);
+  return m ? m[0] : '';
+}
+
+/** Rótulo de mês curto (ex.: 'jul') a partir de 'yyyy-MM-...'. */
+export function shortMonth(datetime = '') {
+  const m = String(datetime).match(/^(\d{4})-(\d{2})/);
+  if (!m) return '';
+  const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  return meses[Number(m[2]) - 1] || '';
+}

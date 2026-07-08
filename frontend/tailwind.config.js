@@ -1,3 +1,27 @@
+import { loadEnv } from 'vite';
+
+// Cor primária configurável via .env do frontend (VITE_PRIMARY_COLOR).
+// Os tons light/dark são derivados automaticamente do valor principal.
+const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), 'VITE_');
+// Normaliza: aceita "#00aeef" ou "00aeef"; cai no default se vazio.
+let PRIMARY = (env.VITE_PRIMARY_COLOR || '').trim().replace(/^["']|["']$/g, '');
+if (PRIMARY && !PRIMARY.startsWith('#')) PRIMARY = `#${PRIMARY}`;
+if (!PRIMARY) PRIMARY = '#00aeef';
+
+/** Clareia (amount > 0) ou escurece (amount < 0) uma cor hex. */
+function shade(hex, amount) {
+  const h = hex.replace('#', '');
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const num = parseInt(full, 16);
+  const target = amount >= 0 ? 255 : 0;
+  const p = Math.abs(amount);
+  const mix = (c) => Math.round(c + (target - c) * p);
+  const r = mix((num >> 16) & 255);
+  const g = mix((num >> 8) & 255);
+  const b = mix(num & 255);
+  return '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('');
+}
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{vue,js,ts}'],
@@ -5,9 +29,9 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#2563eb', // blue-600
-          light: '#3b82f6', // blue-500
-          dark: '#1d4ed8', // blue-700
+          DEFAULT: PRIMARY,
+          light: shade(PRIMARY, 0.18),
+          dark: shade(PRIMARY, -0.18),
         },
       },
       fontFamily: {
