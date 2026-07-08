@@ -91,7 +91,7 @@ const detalheCampos = computed(() => {
     { label: 'Ativado em', date: i.ativadoEm },
     { label: 'Renovação', date: i.renovacao },
     { label: 'Expiração', date: i.expiracao },
-    { label: 'Fidelidade', value: i.fidelidadeMeses ? `${i.fidelidadeMeses} meses` : '—' },
+    { label: 'Permanência', value: i.fidelidadeMeses ? `${i.fidelidadeMeses} meses` : '—' },
   ];
 });
 </script>
