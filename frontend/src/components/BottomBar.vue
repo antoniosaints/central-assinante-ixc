@@ -2,6 +2,7 @@
 import { House, Signal, ChartColumn } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 
+const emit = defineEmits(['navigate']);
 const route = useRoute();
 
 const tabs = [
@@ -11,11 +12,15 @@ const tabs = [
 ];
 
 const isActive = (tab) => route.meta.tab === tab.name;
+
+function handleClick(tab) {
+  if (!isActive(tab)) emit('navigate');
+}
 </script>
 
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-app border-t border-slate-100 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)-0.4rem)] pt-2 shadow-nav backdrop-blur"
+    class="z-30 shrink-0 border-t border-slate-100 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-2 shadow-nav backdrop-blur"
   >
     <div class="flex items-stretch justify-around">
       <RouterLink
@@ -23,6 +28,7 @@ const isActive = (tab) => route.meta.tab === tab.name;
         :key="tab.name"
         :to="tab.to"
         class="group relative flex flex-1 flex-col items-center gap-1 rounded-2xl py-1.5 transition-colors"
+        @click="handleClick(tab)"
       >
         <span
           class="flex h-9 w-16 items-center justify-center rounded-full transition-all duration-300"
