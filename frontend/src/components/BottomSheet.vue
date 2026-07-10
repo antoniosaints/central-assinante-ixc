@@ -16,7 +16,7 @@ defineEmits(['close']);
         <Transition name="sheet" appear>
           <div
             v-if="open"
-            class="relative z-10 w-full max-w-app rounded-t-3xl bg-white p-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] shadow-2xl"
+            class="relative z-10 w-full max-w-app rounded-t-3xl bg-white p-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] shadow-2xl ring-1 ring-slate-100"
           >
             <div class="mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-200" />
             <div class="mb-4 flex items-center justify-between">

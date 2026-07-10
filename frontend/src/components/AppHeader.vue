@@ -18,8 +18,9 @@ const nome = computed(() => firstName(props.perfil?.nome || ''));
 
 <template>
   <header
-    class="sticky top-0 z-30 bg-gradient-to-b from-primary to-primary-light px-4 pb-5 pt-[calc(env(safe-area-inset-top)+0.9rem)] text-white shadow-lg shadow-primary/20"
+    class="sticky top-0 z-30 overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-primary-light px-4 pb-5 pt-[calc(env(safe-area-inset-top)+0.9rem)] text-white shadow-lg shadow-primary/20"
   >
+    <div class="pointer-events-none absolute -right-10 -top-16 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <template v-if="loading">

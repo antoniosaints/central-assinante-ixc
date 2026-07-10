@@ -7,7 +7,7 @@ defineProps({
 
 <template>
   <div
-    class="rounded-3xl bg-white p-5 shadow-card transition-all duration-300"
+    class="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100/70 transition-all duration-300"
     :class="interactive ? 'md:hover:-translate-y-0.5 md:hover:shadow-card-hover' : ''"
   >
     <slot />

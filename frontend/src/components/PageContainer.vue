@@ -6,7 +6,7 @@
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-1 px-4 pb-28 pt-4">
+  <div class="animate-fade-in space-y-1 px-4 pb-28 pt-4 md:mx-auto md:w-full md:max-w-[76rem] md:px-8 md:pb-12 md:pt-7 xl:px-10">
     <slot />
   </div>
 </template>

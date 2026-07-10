@@ -3,11 +3,32 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  :root.dark {
+    color-scheme: dark;
+  }
+
   html,
   body {
     @apply bg-slate-100 text-slate-800 antialiased;
     font-family: 'Sora', 'Inter', system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
+    min-height: 100%;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 50% -20%, rgb(0 174 239 / 0.18), transparent 34rem),
+      #f1f5f9;
+  }
+
+  .dark body {
+    background:
+      radial-gradient(circle at 50% -20%, rgb(0 174 239 / 0.15), transparent 32rem),
+      #07131d;
   }
 
   /* Rolagem suave sem barra visível dentro do "app". */
@@ -17,6 +38,78 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+}
+
+/* Tokens de superfícies para o modo escuro. Mantêm os componentes existentes
+   coerentes sem duplicar uma variante em cada uso de utilitário. */
+.dark .bg-white { background-color: #102330; }
+.dark .bg-white\/95 { background-color: rgb(16 35 48 / 0.95); }
+.dark .bg-slate-50 { background-color: #0c1c27; }
+.dark .bg-slate-100 { background-color: #102330; }
+.dark .bg-slate-200\/70 { background-color: rgb(51 76 91 / 0.7); }
+.dark .text-slate-800 { color: #f2f7fa; }
+.dark .text-slate-700 { color: #d6e2e9; }
+.dark .text-slate-600 { color: #bfd0da; }
+.dark .text-slate-500 { color: #9fb4c0; }
+.dark .text-slate-400 { color: #7f9aa9; }
+.dark .border-slate-100 { border-color: #1b3545; }
+.dark .border-slate-200 { border-color: #294556; }
+.dark .shadow-card { box-shadow: 0 16px 34px -20px rgb(0 0 0 / 0.72); }
+.dark .shadow-nav { box-shadow: 0 -12px 32px -20px rgb(0 0 0 / 0.7); }
+.dark .bg-emerald-50 { background-color: rgb(6 78 59 / 0.45); }
+.dark .bg-amber-50 { background-color: rgb(120 53 15 / 0.38); }
+.dark .bg-blue-50 { background-color: rgb(30 64 175 / 0.32); }
+.dark .bg-rose-50 { background-color: rgb(136 19 55 / 0.32); }
+.dark .ring-slate-100 { --tw-ring-color: #1b3545; }
+
+/* Acabamentos de aplicativo instalado. */
+.app-shell {
+  background: linear-gradient(160deg, #f8fbfd 0%, #eef5f8 100%);
+}
+.dark .app-shell {
+  background: linear-gradient(160deg, #102330 0%, #091923 100%);
+}
+
+/* Mantém o menu alinhado à borda da moldura do app em qualquer viewport. */
+.profile-menu {
+  top: max(calc(env(safe-area-inset-top) + 4rem), calc(4vh + 4rem));
+  right: max(1rem, calc(50vw - 15rem + 1rem));
+}
+
+.desktop-sidebar {
+  background:
+    radial-gradient(circle at 15% 0%, rgb(103 232 249 / 0.2), transparent 20rem),
+    linear-gradient(160deg, #073b5c 0%, #075b85 48%, #078cbf 100%);
+}
+
+.desktop-topbar {
+  background: rgb(248 251 253 / 0.82);
+  border-bottom: 1px solid rgb(226 232 240 / 0.75);
+  backdrop-filter: blur(18px);
+}
+
+.dark .desktop-topbar {
+  background: rgb(9 25 35 / 0.82);
+  border-bottom-color: rgb(41 69 86 / 0.8);
+}
+
+@media (min-width: 768px) {
+  .desktop-shell .app-shell {
+    background: transparent;
+  }
+  .desktop-profile-menu {
+    top: 5.15rem;
+    right: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    outline: 1px solid rgb(148 163 184 / 0.18);
+  }
+  .dark .app-shell {
+    outline-color: rgb(125 211 252 / 0.13);
   }
 }
 
@@ -40,6 +133,18 @@
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-shell::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.34);
+  }
+  .dark .app-shell::after { box-shadow: inset 0 1px rgb(186 230 253 / 0.08); }
 }
 .page-enter-from {
   opacity: 0;
