@@ -176,6 +176,24 @@ export const radMensalMock = [
   { id: '652120', data: '2026-05-01 00:00:00', download: 2650120000, upload: 141900000 },
 ];
 
+// ----- Dispositivos (ACS acs_device) já no formato da aplicação -----
+export const acsDevicesMock = [
+  {
+    id: '8945',
+    principal: true,
+    status: 'online',
+    modelo: 'AX3s',
+    fabricante: 'Huawei',
+    serial: '25Z7S25311002449',
+    ipv4: '100.100.16.151',
+    wifi24: 'CAS-Casa',
+    wifi5: 'CAS-Casa-5G',
+    ultimoContato: '2026-07-11 11:17:27',
+    atualizadoEm: '2026-07-11 08:35:15',
+    idLogin: '26686',
+  },
+];
+
 export const pagamentos = [
   { id: 'PAG-201', referencia: 'Mensalidade 05/2026', valor: 129.9, data: '2026-05-08', metodo: 'Pix', status: 'confirmado' },
   { id: 'PAG-200', referencia: 'Mensalidade 04/2026', valor: 129.9, data: '2026-04-09', metodo: 'Cartão de crédito', status: 'confirmado' },

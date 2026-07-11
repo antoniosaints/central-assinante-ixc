@@ -93,6 +93,25 @@ export function formatDuration(seconds) {
   return `${s}s`;
 }
 
+/**
+ * Formata data + hora (Date | ISO | 'yyyy-MM-dd HH:MM:SS') como
+ * 'dd/MM/yyyy HH:MM'. Retorna '—' para valores vazios/inválidos.
+ * @param {string|Date} value
+ */
+export function formatDateTime(value) {
+  if (!value) return '—';
+  // 'yyyy-MM-dd HH:MM:SS' -> ISO local (evita parse ambíguo entre browsers).
+  const normalized =
+    typeof value === 'string' ? value.replace(' ', 'T') : value;
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return '—';
+  const dd = String(date.getDate()).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  return `${dd}/${mm}/${date.getFullYear()} ${hh}:${min}`;
+}
+
 /** Hora curta (HH:MM) a partir de 'yyyy-MM-dd HH:MM:SS'. */
 export function shortTime(datetime = '') {
   const m = String(datetime).match(/\d{2}:\d{2}/);

@@ -6,7 +6,11 @@ import axios from 'axios';
  */
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || '/api',
-  TIMEOUT: Number(import.meta.env.VITE_API_TIMEOUT) || 15000,
+  // Precisa ser MAIOR que o pior caso do backend contra o IXC
+  // (timeout por tentativa × tentativas + backoff), senão o front aborta
+  // enquanto o backend ainda está tentando — causava "erro no login" que
+  // funcionava no retry manual.
+  TIMEOUT: Number(import.meta.env.VITE_API_TIMEOUT) || 40000,
   // Restaura o token persistido para as chamadas feitas antes do login store.
   TOKEN: localStorage.getItem('cas.token') || '',
 };

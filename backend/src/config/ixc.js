@@ -10,7 +10,16 @@ export const ixcConfig = {
   baseURL: process.env.IXC_API_URL || '',
   user: process.env.IXC_API_USER || '',
   password: process.env.IXC_API_PASSWORD || '',
-  timeout: Number(process.env.IXC_API_TIMEOUT) || 20000,
+  // Timeout POR TENTATIVA. Menor que antes porque agora há retry (ver abaixo):
+  // é melhor falhar rápido e tentar de novo do que esperar 20s numa tentativa.
+  timeout: Number(process.env.IXC_API_TIMEOUT) || 12000,
+  // Nº de tentativas EXTRAS em falhas transitórias (timeout/rede/5xx do IXC).
+  // Total de tentativas = retries + 1. 0 desliga o retry.
+  retries: Number.isFinite(Number(process.env.IXC_API_RETRIES))
+    ? Number(process.env.IXC_API_RETRIES)
+    : 2,
+  // Base do backoff (ms): espera cresce a cada tentativa (base, base*2, ...).
+  retryDelay: Number(process.env.IXC_API_RETRY_DELAY) || 300,
 };
 
 export const isIxcConfigured = () =>
@@ -27,6 +36,44 @@ export const ixcClient = axios.create({
     : undefined,
 });
 
+/** Pausa por `ms` milissegundos. */
+const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Classifica uma falha do Axios como transitória (vale a pena tentar de novo):
+ * timeout, ausência de resposta (rede/DNS/conexão) ou 5xx do IXC.
+ * NÃO trata 4xx nem erros já normalizados (que possuem `status`) como
+ * transitórios — evita mascarar credencial inválida ou erro de negócio.
+ */
+function ehTransitorio(err) {
+  if (!err || err.status) return false; // erro já normalizado por nós
+  if (err.code === 'ECONNABORTED') return true; // timeout do Axios
+  const transientes = ['ECONNRESET', 'ETIMEDOUT', 'EAI_AGAIN', 'ECONNREFUSED'];
+  if (transientes.includes(err.code)) return true;
+  if (!err.response) return true; // sem resposta => problema de rede
+  return err.response.status >= 500; // 5xx do provedor
+}
+
+/**
+ * Executa uma request no IXC com retry+backoff em falhas transitórias.
+ * As consultas do IXC ("listar") são leituras idempotentes — reenviar é seguro
+ * mesmo via POST. Usado por `ixcListar` e `ixcDownload`.
+ */
+async function requestComRetry(config) {
+  let ultimoErro;
+  for (let tentativa = 0; tentativa <= ixcConfig.retries; tentativa += 1) {
+    try {
+      return await ixcClient.request(config);
+    } catch (err) {
+      ultimoErro = err;
+      const podeRepetir = tentativa < ixcConfig.retries && ehTransitorio(err);
+      if (!podeRepetir) throw err;
+      await esperar(ixcConfig.retryDelay * 2 ** tentativa); // 300, 600, ...
+    }
+  }
+  throw ultimoErro;
+}
+
 /**
  * Executa uma consulta padrão do IXC (header `ixcsoft: listar`).
  * O IXC aceita o corpo de consulta tanto em POST quanto em GET.
@@ -36,7 +83,7 @@ export const ixcClient = axios.create({
  * @param {'post'|'get'} metodo  método HTTP (default: post)
  */
 export async function ixcListar(recurso, body, metodo = 'post') {
-  const { data } = await ixcClient.request({
+  const { data } = await requestComRetry({
     method: metodo,
     url: `/${recurso}`,
     data: body,
@@ -58,7 +105,7 @@ export async function ixcListar(recurso, body, metodo = 'post') {
  * Se o IXC devolver JSON (erro), converte e lança.
  */
 export async function ixcDownload(recurso, body, metodo = 'get') {
-  const resp = await ixcClient.request({
+  const resp = await requestComRetry({
     method: metodo,
     url: `/${recurso}`,
     data: body,

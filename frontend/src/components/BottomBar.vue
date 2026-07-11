@@ -1,5 +1,5 @@
 <script setup>
-import { House, Signal, ChartColumn } from 'lucide-vue-next';
+import { House, Signal, Router, ChartColumn } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 
 const emit = defineEmits(['navigate']);
@@ -8,6 +8,7 @@ const route = useRoute();
 const tabs = [
   { name: 'inicio', label: 'Início', icon: House, to: '/' },
   { name: 'consumo', label: 'Consumo', icon: Signal, to: '/consumo' },
+  { name: 'dispositivos', label: 'Aparelhos', icon: Router, to: '/dispositivos' },
   { name: 'relatorios', label: 'Relatórios', icon: ChartColumn, to: '/relatorios' },
 ];
 
@@ -20,7 +21,7 @@ function handleClick(tab) {
 
 <template>
   <nav
-    class="z-30 shrink-0 border-t border-slate-100 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-2 shadow-nav backdrop-blur"
+    class="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-app border-t border-slate-100 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 shadow-nav backdrop-blur"
   >
     <div class="flex items-stretch justify-around">
       <RouterLink

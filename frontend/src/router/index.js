@@ -27,6 +27,12 @@ const routes = [
         meta: { title: 'Consumo', tab: 'consumo' },
       },
       {
+        path: 'dispositivos',
+        name: 'dispositivos',
+        component: () => import('@/pages/DispositivosPage.vue'),
+        meta: { title: 'Dispositivos', tab: 'dispositivos' },
+      },
+      {
         path: 'relatorios',
         name: 'relatorios',
         component: () => import('@/pages/RelatoriosPage.vue'),

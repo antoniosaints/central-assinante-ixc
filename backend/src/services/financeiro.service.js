@@ -87,6 +87,10 @@ function valorFatura(reg) {
 function mapFatura(reg) {
   const vencimento = data(reg.data_vencimento);
   const tipo = reg.tipo_recebimento || '';
+  // O IXC gera o boleto (PDF) via /get_boleto para qualquer recebimento em
+  // aberto, independentemente do tipo — inclusive quando está configurado como
+  // Pix. Só não faz sentido para o que já foi recebido (R) ou cancelado (C).
+  const emAberto = reg.status !== 'R' && reg.status !== 'C';
   return {
     id: reg.id,
     competencia: vencimento.slice(0, 7), // yyyy-MM
@@ -98,7 +102,7 @@ function mapFatura(reg) {
     tipoRecebimento: tipo,
     linhaDigitavel: reg.linha_digitavel || '',
     temPix: Boolean(reg.pix_txid),
-    podeBaixarBoleto: tipo.toLowerCase() === 'boleto',
+    podeBaixarBoleto: emAberto,
     idContrato: reg.id_contrato || '',
     documento: reg.documento || '',
   };

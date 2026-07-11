@@ -1,5 +1,5 @@
 <script setup>
-import { LayoutDashboard, Signal, ChartColumn, UserRound } from 'lucide-vue-next';
+import { LayoutDashboard, Signal, Router, ChartColumn, UserRound } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 
 const emit = defineEmits(['navigate']);
@@ -8,6 +8,7 @@ const route = useRoute();
 const items = [
   { name: 'inicio', label: 'Visão geral', description: 'Sua conta', icon: LayoutDashboard, to: '/' },
   { name: 'consumo', label: 'Consumo', description: 'Uso em tempo real', icon: Signal, to: '/consumo' },
+  { name: 'dispositivos', label: 'Dispositivos', description: 'Aparelhos vinculados', icon: Router, to: '/dispositivos' },
   { name: 'relatorios', label: 'Faturas e contratos', description: 'Histórico financeiro', icon: ChartColumn, to: '/relatorios' },
 ];
 

@@ -4,6 +4,7 @@ import { ClientesService } from '../services/clientes.service.js';
 import { ContratosService } from '../services/contratos.service.js';
 import { FinanceiroService } from '../services/financeiro.service.js';
 import { ConsumoService } from '../services/consumo.service.js';
+import { DispositivosService } from '../services/dispositivos.service.js';
 import { RelatoriosService } from '../services/relatorios.service.js';
 import { SessionStore } from '../store/sessions.js';
 
@@ -81,6 +82,11 @@ router.get('/consumo/tempo-real', wrap(async (req, res) => {
 
 router.get('/consumo/mensal', wrap(async (req, res) => {
   res.json(await ConsumoService.mensal(getToken(req), req.query.login));
+}));
+
+// ---------- Dispositivos (ACS) ----------
+router.get('/dispositivos', wrap(async (req, res) => {
+  res.json(await DispositivosService.listar(getToken(req), req.query.login));
 }));
 
 // ---------- Relatórios ----------

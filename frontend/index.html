@@ -5,10 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#00aeef" />
+  <!-- Cor da status bar = topo do header (primary-dark). Sincronizada em runtime
+       com a cor primária configurada (VITE_PRIMARY_COLOR) em main.js. -->
+  <meta name="theme-color" content="#008fc4" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <!-- translucent: o header (com padding de safe-area) aparece atrás da status bar. -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Central do Assinante" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/icons/icon-192.png" />

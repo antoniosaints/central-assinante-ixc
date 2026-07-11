@@ -57,7 +57,9 @@ async function loginIxc({ email, senha }) {
     query: email,
     oper: '=',
     page: '1',
-    rp: '1000',
+    // A consulta já filtra e-mail + senha + ativo; basta o registro mais recente.
+    // rp baixo deixa a resposta do IXC mais rápida e reduz timeouts no login.
+    rp: '1',
     sortname: 'cliente.id',
     sortorder: 'desc',
     // Valida a senha e exige cliente ativo.

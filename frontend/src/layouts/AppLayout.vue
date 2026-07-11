@@ -43,11 +43,11 @@ onBeforeUnmount(() => clearTimeout(loadingTimer));
 </script>
 
 <template>
-  <div class="desktop-shell min-h-screen md:flex">
+  <div class="desktop-shell min-h-[100dvh] md:flex">
     <DesktopSidebar @navigate="iniciarLoadingNavegacao" />
 
     <!-- No celular, conserva a moldura original. A partir de md, torna-se a área de trabalho ampla. -->
-    <div class="app-shell relative mx-auto flex h-screen max-h-screen max-w-app flex-1 flex-col overflow-hidden bg-slate-100 shadow-2xl shadow-slate-300/40 dark:shadow-black/40 md:mx-0 md:h-screen md:max-h-none md:max-w-none md:rounded-none md:shadow-none">
+    <div class="app-shell relative mx-auto flex h-[100dvh] max-h-[100dvh] max-w-app flex-1 flex-col overflow-hidden bg-slate-100 shadow-2xl shadow-slate-300/40 dark:shadow-black/40 md:mx-0 md:h-screen md:max-h-none md:max-w-none md:rounded-none md:shadow-none">
       <DesktopTopbar :perfil="perfil" :loading="loading" />
       <AppHeader class="md:hidden" :perfil="perfil" :loading="loading" />
 
